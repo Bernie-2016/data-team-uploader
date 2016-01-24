@@ -1,0 +1,97 @@
+<script>
+$( document ).ready(function() {
+
+  var form = document.getElementById('uploadEventDataForm');
+  var formInputs = {};
+
+  form.state.options[0] = new Option();
+  states.forEach(function(state){
+    form.state.options[form.state.options.length] = new Option(state.name, state.abbreviation);
+  });
+
+  form.state.selectedIndex = -1;
+
+  var numUploads = {};
+  numUploads.done = 0;
+  numUploads.total = 0;
+
+  // Upload the files into a folder in drive
+  // This is set to send them all to one folder (specificed in the .gs file)
+  $('#uploadEventDataForm').on( "submit", iteratorFileUpload );
+
+  function iteratorFileUpload(e) {
+    e.preventDefault();
+
+    var allFiles = document.getElementById('myFile').files;
+    formData = $('#uploadEventDataForm').serializeArray();
+
+    formInputs = {};
+    for (var n = 0; n < formData.length; n++){
+      formInputs[formData[n].name] = formData[n].value;
+    }
+
+    if (allFiles.length == 0) {
+        alert('No file selected!');
+    } else {
+      //Show Progress Bar 
+      numUploads.total = allFiles.length;
+      $('#progressbar').progressbar({
+        value : false
+      });
+      //.append("<div class='caption'>37%</div>");
+      $(".progress-label").html('Preparing files for upload');
+
+      // Send each file at a time
+      for (var i = 0; i < allFiles.length; i++) {
+        sendFileToDrive(allFiles[i]);
+      }
+    }
+  } 
+
+  function sendFileToDrive(file) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+          var content = reader.result;
+          console.log('Sending ' + file.name);
+          var currFolder = 'Something';
+          google.script.run.withSuccessHandler(updateProgressbar)
+            .uploadFileToDrive(content, file.name, formInputs);
+      }
+      reader.readAsDataURL(file);
+  } 
+
+  function updateProgressbar( idUpdate ){
+     console.log('Received: ' + idUpdate);
+     numUploads.done++;
+     var porc = Math.ceil((numUploads.done / numUploads.total)*100);
+     $("#progressbar").progressbar({value: porc });
+     $(".progress-label").text(numUploads.done +'/'+ numUploads.total);
+     if( numUploads.done == numUploads.total ){
+        //uploadsFinished();
+        numUploads.done = 0;
+     };
+  }
+
+  function fileUploaded(status) {
+    document.getElementById('uploadEventDataForm').style.display = 'none';
+    document.getElementById('output').innerHTML = status;
+  }
+
+  $('#sourceSelect').on( "change", function(e){
+    if (e.target.value == 'barnstorm'){
+      $('#barnstormID').removeClass('hidden');
+      $('#locationInputs').addClass('hidden');
+
+      $('#barnstormID :input').prop('required', true);
+      $('#locationInputs :input').prop('required', false);
+    }
+    else {
+      $('#barnstormID').addClass('hidden');
+      $('#locationInputs').removeClass('hidden');
+
+      $('#barnstormID :input').prop('required', false);
+      $('#locationInputs :input').prop('required', true);
+    }
+  });
+});
+</script>
