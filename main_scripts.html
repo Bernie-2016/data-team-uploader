@@ -3,6 +3,10 @@ $( document ).ready(function() {
 
   var form = document.getElementById('uploadEventDataForm');
   var formInputs = {};
+  var defaultEmail = document.cookie;
+  if (defaultEmail && !form.email.value) {
+    form.email.value = defaultEmail;
+  }
 
   form.state.options[0] = new Option();
   states.forEach(function(state){
@@ -35,6 +39,7 @@ $( document ).ready(function() {
     } else {
       //Show Progress Bar
       $('#uploadEventDataForm :submit').prop('disabled', 'disabled');
+      document.cookie = form.email.value;
       numUploads.total = allFiles.length;
       $('#progressbar').progressbar({
         value : false
