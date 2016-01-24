@@ -22,6 +22,8 @@ $( document ).ready(function() {
   function iteratorFileUpload(e) {
     e.preventDefault();
 
+    $('#uploadEventDataForm :submit').prop('disabled', 'disabled');
+
     var allFiles = document.getElementById('myFile').files;
     formData = $('#uploadEventDataForm').serializeArray();
 
@@ -66,8 +68,8 @@ $( document ).ready(function() {
      $("#progressbar").progressbar({value: porc });
      $(".progress-label").text(numUploads.done +'/'+ numUploads.total);
      if( numUploads.done == numUploads.total ){
-        //uploadsFinished();
         numUploads.done = 0;
+        $('#uploadEventDataForm :submit').removeProp('disabled');
      };
   }
 
