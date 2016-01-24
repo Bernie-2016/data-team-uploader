@@ -11,12 +11,13 @@
   </head>
   <body>
     <body>
-    <?= userEmail ?>
   <div id="formcontainer">
 
     <h2 for="uploadEventDataForm">Event Data Uploader</h2>
 
-    <form id="uploadEventDataForm"> 
+    <form id="uploadEventDataForm">
+      <label for="city">Your Email:</label>
+      <input type="email" name="email" placeholder="email address" class="form-control" value="<?= userEmail ?>" required>
       <div class="form-group">
         <label for="source">Event Source:</label>
         <select name="source" id='sourceSelect' class="form-control" required>

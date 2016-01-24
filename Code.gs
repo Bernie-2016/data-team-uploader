@@ -75,7 +75,7 @@ function uploadFileToDrive(base64Data, originalFileName, form) {
       form.notes = '\n\n' + form.notes;
     };
     var file = folder.createFile(ss)
-        .setDescription('Original Name: ' + originalFileName + form.notes);
+        .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes);
 
     if (Session.getActiveUser().getEmail()){
       file.setStarred(true)
