@@ -30,7 +30,7 @@ function include(fileName) {
   return HtmlService.createHtmlOutputFromFile(fileName).getContent();
 }
 
-function uploadFileToDrive(base64Data, originalFileName, form) {
+function uploadFileToDrive(base64Data, originalFileName, form, index) {
   
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -49,7 +49,9 @@ function uploadFileToDrive(base64Data, originalFileName, form) {
     else {
       var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
     }
-    var fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source;
+    var uniqueID = new Date();
+    uniqueID = uniqueID.toISOString() + String(index + 1);
+    var fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
     ss.setName(fileName);
 
     if (form.fileType == 'pb'){

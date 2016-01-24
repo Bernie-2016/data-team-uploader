@@ -43,19 +43,18 @@ $( document ).ready(function() {
 
       // Send each file at a time
       for (var i = 0; i < allFiles.length; i++) {
-        sendFileToDrive(allFiles[i]);
+        sendFileToDrive(allFiles[i], i);
       }
     }
   } 
 
-  function sendFileToDrive(file) {
+  function sendFileToDrive(file, index) {
       var reader = new FileReader();
       reader.onload = function (e) {
           var content = reader.result;
           console.log('Sending ' + file.name);
-          var currFolder = 'Something';
           google.script.run.withSuccessHandler(updateProgressbar)
-            .uploadFileToDrive(content, file.name, formInputs);
+            .uploadFileToDrive(content, file.name, formInputs, index);
       }
       reader.readAsDataURL(file);
   } 
