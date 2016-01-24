@@ -19,7 +19,7 @@ function doGet() {
 
   template.barnstorms = barnstorms.sort();
   return template.evaluate()
-    .setFaviconUrl('http://s.bsd.net/bernie16/main/page/-/favicon.ico')
+    // .setFaviconUrl('https://s.bsd.net/bernie16/main/page/-/favicon.ico')
     .setTitle('Upload Event Data')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);

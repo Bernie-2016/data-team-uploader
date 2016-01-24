@@ -4,6 +4,7 @@
     <base target="_top">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <?!= include('styles'); ?>
@@ -15,39 +16,33 @@
     <h2 for="uploadEventDataForm">Event Data Uploader</h2>
 
     <form id="uploadEventDataForm"> 
-      <div>
+      <div class="form-group">
         <label for="source">Event Source:</label>
-        <br>
-        <select name="source" id='sourceSelect'>
+        <select name="source" id='sourceSelect' class="form-control" required>
           <option value="barnstorm">Barnstorm</option>
           <option value="other">Other</option>
         </select>
       </div>
       <div id='barnstormID'>
         <label for="barnstorm">Select the Barnstorm:</label>
-        <br>
-        <select name="barnstorm" id="barnstormSelect" required>
+        <select name="barnstorm" id="barnstormSelect" class="form-control" required>
           <option></option>
           <? for (var i = 0; i < barnstorms.length; i++) { ?>
             <option value="<?= barnstorms[i] ?>"><?= barnstorms[i] ?></option>
           <? } ?>
         </select>
-        <br>
       </div>
       <div id="locationInputs" class="hidden">
         <label for="city">Event City:</label>
-        <br>
-        <input type="text" name="city" placeholder="City"><br/>
+        <input type="text" name="city" placeholder="City" class="form-control">
         
         <label for="state">Event State:</label>
-        <br>
-        <select name="state" id="stateSelect"></select>
+        <select name="state" id="stateSelect" class="form-control"></select>
       </div>
 
       <div>
         <label for="fileType">What are you uploading?</label>
-        <br>
-        <select name="fileType" required>
+        <select name="fileType" class="form-control" required>
           <option value="pb">Phonebank sheets to be entered</option>
           <option value="si">Lists of Event Attendees</option>
           <option value="mixed">Both</option>
@@ -56,24 +51,26 @@
 
       <label for="fileText">Note (optional):</label>
 
-          <TEXTAREA name="notes" 
-          placeholder="Add any special notes here"
-          style ="width:400px; height:200px;"
+          <TEXTAREA
+            name="notes" 
+            placeholder="Add any special notes here"
+            class="form-control"
+            style="height:120px;"
           ></TEXTAREA>
 
-      <br><br>
+      <br>
 
       <label for="myFile">Upload Attachment(s):</label>
       <br>
 
       <input type="file" name="filename" id="myFile" multiple>
 
-      <button type="submit" style="width:100%;">Submit</button>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
 
     </form>
   </div>
 
-  <br/>
+  <br>
   <div id="output"></div>
   <div id="progressbar">
     <div class="progress-label"></div>
