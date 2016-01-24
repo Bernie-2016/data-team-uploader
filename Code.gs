@@ -17,6 +17,7 @@ function doGet() {
     }
   }
 
+  template.userEmail = Session.getActiveUser().getEmail();
   template.barnstorms = barnstorms.sort();
   return template.evaluate()
     // .setFaviconUrl('https://s.bsd.net/bernie16/main/page/-/favicon.ico')
@@ -75,6 +76,10 @@ function uploadFileToDrive(base64Data, originalFileName, form) {
     };
     var file = folder.createFile(ss)
         .setDescription('Original Name: ' + originalFileName + form.notes);
+
+    if (Session.getActiveUser().getEmail()){
+      file.setStarred(true)
+    };
 
     return file.getName();
   }catch(e){
