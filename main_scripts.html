@@ -73,7 +73,7 @@ $( document ).ready(function() {
      $(".progress-label").text(numUploads.done +'/'+ numUploads.total);
      if( numUploads.done == numUploads.total ){
         numUploads.done = 0;
-        $('#uploadEventDataForm :submit').removeProp('disabled');
+        $('#uploadEventDataForm :submit').html('Upload Complete');
      };
   }
 
