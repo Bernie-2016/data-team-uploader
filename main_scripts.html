@@ -45,7 +45,7 @@ $( document ).ready(function() {
         value : false
       });
       //.append("<div class='caption'>37%</div>");
-      $(".progress-label").html('Preparing files for upload');
+      $(".progress-label").html('Uploading files...');
 
       // Send each file at a time
       for (var i = 0; i < allFiles.length; i++) {
@@ -73,7 +73,7 @@ $( document ).ready(function() {
      $(".progress-label").text(numUploads.done +'/'+ numUploads.total);
      if( numUploads.done == numUploads.total ){
         numUploads.done = 0;
-        $('#uploadEventDataForm :submit').html('Upload Complete');
+        $('#uploadEventDataForm :submit').html('Upload Complete').removeClass('btn-primary').addClass('btn-success');
      };
   }
 
