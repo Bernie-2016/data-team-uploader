@@ -54,8 +54,11 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     var fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
     ss.setName(fileName);
 
-    if (form.fileType == 'pb'){
+    if (form.fileType == 'pb-c' || form.fileType == 'pb-r'){
       var folderName = 'Phone Banks';
+    }
+    else if (form.fileType == 'pb-i'){
+      var folderName = 'Incomplete Phone Banks';
     }
     else if (form.fileType == 'si'){
       var folderName = 'Sign In Sheets';
@@ -79,8 +82,9 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     var file = folder.createFile(ss)
         .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes);
 
-    if (Session.getActiveUser().getEmail()){
+    if (form.fileType == 'pb-r'){
       file.setStarred(true)
+        .setName('[RUSH] ' + fileName);
     };
 
     return file.getName();
