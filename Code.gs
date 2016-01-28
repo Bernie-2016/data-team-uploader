@@ -1,6 +1,7 @@
 var SPREADSHEET_ID = '1Io7RR9tqWnYqUHQcOg2IQM5EzZLMKKSGRuSNAmNipv4';
 var SHEET_NAME = 'Data Entry List';
-var FOLDER_ID = '0Bw9Apc7v0NrZMlhBS0JYZHM5cW8';
+var ROOT_FOLDER_ID = '0Bw9Apc7v0NrZMlhBS0JYZHM5cW8';
+var PHOTOS_FOLDER_ID = '0Bw9Apc7v0NrZMXl2XzdWbUpWdHc';
 
 function doGet() {
   var template = HtmlService.createTemplateFromFile('form');
@@ -49,10 +50,6 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     else {
       var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
     }
-    var uniqueID = new Date();
-    uniqueID = uniqueID.toISOString() + String(index + 1);
-    var fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
-    ss.setName(fileName);
 
     if (form.fileType == 'pb-c' || form.fileType == 'pb-r'){
       var folderName = 'Phone Banks';
@@ -63,17 +60,35 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     else if (form.fileType == 'si'){
       var folderName = 'Sign In Sheets';
     }
+    else if (form.fileType == 'photos'){
+      var folderName = 'Event Photo Submissions';
+    }
     else {
       var folderName = 'Mixed Files';
     }
 
-    var rootFolder = DriveApp.getFolderById(FOLDER_ID);
-    var folders = rootFolder.getFoldersByName(folderName);
+    // Select folder and set file name
+    var folder = null;
+    if (folderName === 'Event Photo Submissions'){
+      folder = DriveApp.getFolderById(PHOTOS_FOLDER_ID);
 
-    if (folders.hasNext()) {
-      folder = folders.next();
-    } else {
-      folder = rootFolder.createFolder(folderName);
+      var fileName = firstNameTag + ' ' + originalFileName;
+      ss.setName(fileName);
+    }
+    else {
+      var rootFolder = DriveApp.getFolderById(ROOT_FOLDER_ID);
+      var folders = rootFolder.getFoldersByName(folderName);
+
+      if (folders.hasNext()) {
+        folder = folders.next();
+      } else {
+        folder = rootFolder.createFolder(folderName);
+      }
+
+      var uniqueID = new Date();
+      uniqueID = uniqueID.toISOString() + String(index + 1);
+      var fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
+      ss.setName(fileName);
     }
 
     if (form.notes){
@@ -87,7 +102,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
         .setName('[RUSH] ' + fileName);
     };
 
-    return file.getName();
+    return originalFileName
   }catch(e){
     Logger.log(e.toString());
     return 'Error: ' + e.toString();
