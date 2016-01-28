@@ -68,11 +68,11 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     }
 
     // Select folder and set file name
-    var folder = null;
+    var folder, fileName;
     if (folderName === 'Event Photo Submissions'){
       folder = DriveApp.getFolderById(PHOTOS_FOLDER_ID);
 
-      var fileName = firstNameTag + ' ' + originalFileName;
+      fileName = firstNameTag + ' ' + originalFileName;
       ss.setName(fileName);
     }
     else {
@@ -87,7 +87,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
 
       var uniqueID = new Date();
       uniqueID = uniqueID.toISOString() + String(index + 1);
-      var fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
+      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
       ss.setName(fileName);
     }
 
@@ -101,6 +101,27 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
       file.setStarred(true)
         .setName('[RUSH] ' + fileName);
     };
+
+    // Send upload email notification
+    var msgRecipient, msgSubject;
+    var msgContent = 'View the file here: ' + file.getUrl();
+    msgContent += '\n\n' + file.getDescription();
+    var msgOptions = {
+      name: 'Event Data Uploader',
+      replyTo: form.email
+    }
+    if (folderName === 'Event Photo Submissions'){
+      msgRecipient = 'corbin+eventphotos@berniesanders.com';
+      msgSubject = 'New Photo Upload: ' + fileName;
+      msgOptions.htmlBody = msgContent.replace(/(?:\r\n|\r|\n)/g, '<br />') + '<br /><br /><img src="cid:image" />';
+      msgOptions.inlineImages = {'image': file.getBlob()};
+    }
+    else {
+      msgRecipient = 'dataentry+' + form.fileType + '@berniesanders.com';
+      msgSubject = 'New File Upload: ' + fileName;
+    }
+
+    MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
 
     return originalFileName
   }catch(e){
