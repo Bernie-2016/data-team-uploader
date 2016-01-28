@@ -87,15 +87,23 @@ $( document ).ready(function() {
       $('#barnstormID').removeClass('hidden');
       $('#locationInputs').addClass('hidden');
 
-      $('#barnstormID :input').prop('required', true);
-      $('#locationInputs :input').prop('required', false);
+      $('#barnstormID :input')
+        .prop('required', true)
+        .removeAttr('disabled');
+      $('#locationInputs :input')
+        .prop('required', false)
+        .attr('disabled', 'disabled');
     }
     else {
       $('#barnstormID').addClass('hidden');
       $('#locationInputs').removeClass('hidden');
 
-      $('#barnstormID :input').prop('required', false);
-      $('#locationInputs :input').prop('required', true);
+      $('#barnstormID :input')
+        .prop('required', false)
+        .attr('disabled', 'disabled');
+      $('#locationInputs :input')
+        .prop('required', true)
+        .removeAttr('disabled');
     }
   });
 });
