@@ -57,11 +57,29 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     else if (form.fileType == 'pb-i'){
       var folderName = 'Incomplete Phone Banks';
     }
-    else if (form.fileType == 'si'){
-      var folderName = 'Sign In Sheets';
+    else if (form.fileType == 'pb-multi'){
+      var folderName = 'Phone Banks (multiple)';
     }
-    else if (form.fileType == 'photos'){
-      var folderName = 'Event Photo Submissions';
+    else if (form.fileType == 'pb-si'){
+      var folderName = 'Phone Bank Sign In Sheets';
+    }
+    else if (form.fileType == 'pb-photos'){
+      var folderName = 'Phone Bank Photo Submissions';
+    }
+    if (form.fileType == 'cv-c' || form.fileType == 'cv-r'){
+      var folderName = 'Canvass Events';
+    }
+    else if (form.fileType == 'cv-i'){
+      var folderName = 'Incomplete Canvass Events';
+    }
+    else if (form.fileType == 'cv-multi'){
+      var folderName = 'Canvass Events (multiple)';
+    }
+    else if (form.fileType == 'cv-si'){
+      var folderName = 'Canvass Sign In Sheets';
+    }
+    else if (form.fileType == 'cv-photos'){
+      var folderName = 'Canvass Photo Submissions';
     }
     else {
       var folderName = 'Mixed Files';
@@ -69,10 +87,10 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
 
     // Select folder and set file name
     var folder, fileName;
-    if (folderName === 'Event Photo Submissions'){
+    if (folderName === 'Phone Bank Photo Submissions' || folderName === 'Canvass Photo Submissions'){
       folder = DriveApp.getFolderById(PHOTOS_FOLDER_ID);
 
-      fileName = firstNameTag + ' ' + originalFileName;
+      fileName = firstNameTag + ' ' + form.fileType + ' ' + originalFileName;
       ss.setName(fileName);
     }
     else {
@@ -110,7 +128,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
       name: 'Event Data Uploader',
       replyTo: form.email
     }
-    if (folderName === 'Event Photo Submissions'){
+    if (folderName === 'Phone Bank Photo Submissions' || folderName === 'Canvass Photo Submissions'){
       msgRecipient = 'corbin+eventphotos@berniesanders.com';
       msgSubject = 'New Photo Upload: ' + fileName;
       msgOptions.htmlBody = msgContent.replace(/(?:\r\n|\r|\n)/g, '<br />') + '<br /><br /><img src="cid:image" />';
