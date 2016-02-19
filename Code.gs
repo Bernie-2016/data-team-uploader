@@ -66,7 +66,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     else if (form.fileType == 'pb-photos'){
       var folderName = 'Phone Bank Photo Submissions';
     }
-    if (form.fileType == 'cv-c' || form.fileType == 'cv-r'){
+    else if (form.fileType == 'cv-c' || form.fileType == 'cv-r'){
       var folderName = 'Canvass Events';
     }
     else if (form.fileType == 'cv-i'){
