@@ -105,7 +105,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
 
       var uniqueID = new Date();
       uniqueID = uniqueID.toISOString() + String(index + 1);
-      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID;
+      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID;
       ss.setName(fileName);
     }
 
