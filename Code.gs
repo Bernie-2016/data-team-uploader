@@ -143,6 +143,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     }
 
     MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
+    MailApp.sendEmail(form.email, msgSubject, msgContent, msgOptions);
 
     return originalFileName
   }catch(e){
