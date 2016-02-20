@@ -51,7 +51,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
       var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
     }
 
-    if (form.fileType == 'pb-c' || form.fileType == 'pb-r'){
+    if (form.fileType == 'pb-c'){
       var folderName = 'Phone Banks';
     }
     else if (form.fileType == 'pb-i'){
@@ -59,6 +59,9 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     }
     else if (form.fileType == 'pb-multi'){
       var folderName = 'Phone Banks (multiple)';
+    }
+    else if (form.fileType == 'pb-a'){
+      var folderName = 'Archived Phone Banks';
     }
     else if (form.fileType == 'pb-si'){
       var folderName = 'Phone Bank Sign In Sheets';
