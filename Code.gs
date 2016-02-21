@@ -51,7 +51,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
       var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
     }
 
-    if (form.fileType == 'pb-c' || form.fileType == 'pb-r'){
+    if (form.fileType == 'pb-c'){
       var folderName = 'Phone Banks';
     }
     else if (form.fileType == 'pb-i'){
@@ -60,13 +60,16 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     else if (form.fileType == 'pb-multi'){
       var folderName = 'Phone Banks (multiple)';
     }
+    else if (form.fileType == 'pb-a'){
+      var folderName = 'Archived Phone Banks';
+    }
     else if (form.fileType == 'pb-si'){
       var folderName = 'Phone Bank Sign In Sheets';
     }
     else if (form.fileType == 'pb-photos'){
       var folderName = 'Phone Bank Photo Submissions';
     }
-    if (form.fileType == 'cv-c' || form.fileType == 'cv-r'){
+    else if (form.fileType == 'cv-c' || form.fileType == 'cv-r'){
       var folderName = 'Canvass Events';
     }
     else if (form.fileType == 'cv-i'){
@@ -111,7 +114,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
 
       var uniqueID = new Date();
       uniqueID = uniqueID.toISOString() + String(index + 1);
-      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + uniqueID + '.' + originalExtension;
+      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID + '.' + originalExtension;
       ss.setName(fileName);
     }
 
@@ -146,6 +149,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     }
 
     MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
+    MailApp.sendEmail(form.email, msgSubject, msgContent, msgOptions);
 
     return originalFileName
   }catch(e){
