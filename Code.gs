@@ -90,6 +90,12 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
 
     // Select folder and set file name
     var folder, fileName;
+
+    // Split original file name
+    var fileExtensionArray = originalFileName.split(".");
+    // Get last item in array which should be the extension
+    var originalExtension = fileExtensionArray.pop();
+
     if (folderName === 'Phone Bank Photo Submissions' || folderName === 'Canvass Photo Submissions'){
       folder = DriveApp.getFolderById(PHOTOS_FOLDER_ID);
 
@@ -108,7 +114,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
 
       var uniqueID = new Date();
       uniqueID = uniqueID.toISOString() + String(index + 1);
-      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID;
+      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID + '.' + originalExtension;
       ss.setName(fileName);
     }
 
