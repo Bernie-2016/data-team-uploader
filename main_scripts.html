@@ -15,6 +15,7 @@ $( document ).ready(function() {
   form.state.selectedIndex = 0;
 
   var numUploads = {};
+  var fileUrls = [];
   numUploads.done = 0;
   numUploads.total = 0;
 
@@ -46,6 +47,10 @@ $( document ).ready(function() {
     else {
       //Show Progress Bar
       $('#uploadEventDataForm :submit').prop('disabled', 'disabled');
+
+      // Scroll progress bar into view
+      $('html,body').animate({scrollTop: document.body.scrollHeight},"fast");
+      
       document.cookie = form.email.value;
       numUploads.total = allFiles.length;
       $('#progressbar').progressbar({
@@ -74,15 +79,23 @@ $( document ).ready(function() {
 
   function updateProgressbar( idUpdate ){
      console.log('Received: ' + idUpdate);
+     fileUrls.push(idUpdate);
      numUploads.done++;
      var porc = Math.ceil((numUploads.done / numUploads.total)*100);
      $("#progressbar").progressbar({value: porc });
-     $(".progress-label").text(numUploads.done +'/'+ numUploads.total);
+     $(".progress-label").text(numUploads.done +'/'+ numUploads.total + " Uploaded Successfully");
      if( numUploads.done == numUploads.total ){
         numUploads.done = 0;
-        $('#uploadEventDataForm :submit').html('Upload Complete').removeClass('btn-primary').addClass('btn-success');
-        $('#confirmModal').modal({keyboard: false, backdrop: 'static', show: true});
+        google.script.run.withSuccessHandler(showConfirm)
+            .sendEmailConfirmation(form.email.value, fileUrls);
+        
      };
+  }
+
+  function showConfirm() {
+    $('#uploadEventDataForm :submit').html('Upload Complete').removeClass('btn-primary').addClass('btn-success');
+    $('#confirmModal').modal({keyboard: false, backdrop: 'static', show: true});
+    $('html, body').animate({ scrollTop: 0 });
   }
 
   function fileUploaded(status) {

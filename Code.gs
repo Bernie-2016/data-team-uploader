@@ -1,14 +1,9 @@
+var EVENT_SHEET_ID = '13yXpJiwJt_s-MKaYavsh4JJSknKzdOiPQkz4iNIhUsc';
+var SIGN_IN_SHEET_ID = '1pRWzQ-AC74skmwqrFeZmtsDGrihrdV5lvWAlC3Z4guA';
+var EVENT_SHEET_NAME = 'PHONE BANKS DO NOT MOVE THIS TAB - 1';
+var SIGN_IN_SHEET_NAME = 'DO NOT MOVE THIS TAB';
 
-var EVENT_SHEET_ID = '1urkztZ0PjBAKF1uUeUPYRp1yg3IlwfFvjeKwOa5-Mrc';
-var SIGN_IN_SHEET_ID = '1N_aYGkaO00CJE4hvqDOKpK-1j7DKAvbds1iNTGmDd8A';
-var EVENT_SHEET_NAME = 'Sheet1';
-var SIGN_IN_SHEET_NAME = 'Sheet1';
-
-var ROOT_FOLDER_ID = '0B9nZMQA6JcG8OGJLaVNMaFdJOUU';
-
-// var SPREADSHEET_ID = '1Io7RR9tqWnYqUHQcOg2IQM5EzZLMKKSGRuSNAmNipv4';
-// var SHEET_NAME = 'Data Entry List';
-// var ROOT_FOLDER_ID = '0Bw9Apc7v0NrZMlhBS0JYZHM5cW8';
+var ROOT_FOLDER_ID = '0Bw9Apc7v0NrZMlhBS0JYZHM5cW8';
 
 function doGet() {
   var template = HtmlService.createTemplateFromFile('form');
@@ -24,33 +19,51 @@ function include(fileName) {
   return HtmlService.createHtmlOutputFromFile(fileName).getContent();
 }
 
-function addRowToSpreadsheet(fileName, type, uploadedBy) {
+/**
+ * Adds a row to the spreadsheet using the uploaded file URL and the File Name for friendly display
+*/
+function addRowToSpreadsheet(url, fileName, type, uploadedBy) {
   
-  Logger.log(type);
-
-  if (type == "ev-i" || type == "ev-m") {
+  if (type == "ev-i") {
     var sheetID = EVENT_SHEET_ID;
     var sheetName = EVENT_SHEET_NAME;
-  } else {
+  } else if(type == "si") {
     var sheetID = SIGN_IN_SHEET_ID;
     var sheetName = SIGN_IN_SHEET_NAME;
+  } else {
+    return;
   }
-
-  if(type == 'ev-i') {
-      var displayType = 'Event Sheets';
-    } else if (type == 'ev-m') {
-      var displayType = 'Event Sheets (multiple)';
-    } else if (type == 'si') {
-      var displayType = 'Phone Bank Sign In Sheets';
-    }
 
   sheet = SpreadsheetApp
         .openById(sheetID)
         .getSheetByName(sheetName);
 
-  var formula = '=HYPERLINK("'+fileName+'", "Click Here")';
-  sheet.appendRow([formula, uploadedBy, displayType]);
+  var formula = '=HYPERLINK("'+url+'", "'+fileName+'")';
+  sheet.appendRow([formula]);
 
+}
+
+/**
+ * Sends email confirmation to the data entry team and the uploader with a list of uploaded files.
+ */
+function sendEmailConfirmation(uploadedBy, fileList) {
+    var msgRecipient, msgSubject;
+    var msgContent = 'View the files here: ' + fileList.join("\n");
+    var msgOptions = {
+      name: 'Event Data Uploader',
+      replyTo: uploadedBy
+    }
+
+    var confirmOptions = {
+      name: 'Event Data Uploader',
+      replyTo: 'dataentry@berniesanders.com'
+    }
+
+    msgRecipient = 'dataentry@berniesanders.com';
+    msgSubject = 'New Files Uploaded';
+
+    MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
+    MailApp.sendEmail(uploadedBy, msgSubject, msgContent, confirmOptions);
 }
 
 function uploadFileToDrive(base64Data, originalFileName, form, index) {
@@ -73,7 +86,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     } else if (form.fileType == 'ev-m') {
       var folderName = 'AUTO Event Sheets (multiple)';
     } else if (form.fileType == 'si') {
-      var folderName = 'AUTO Phone Bank Sign In Sheets';
+      var folderName = 'AUTO Sign In Sheets';
     }
 
     // Select folder and set file name
@@ -97,31 +110,24 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     uniqueID = uniqueID.toISOString() + String(index + 1);
     fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID + '.' + originalExtension;
     ss.setName(fileName);
-
+    
     var file = folder.createFile(ss)
         .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes)
         .setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.VIEW);
-
+    
+    // Get public File URL so we can add it to the sheet
     var url = file.getUrl();
-
-    addRowToSpreadsheet(url, form.fileType, form.email);
-
-    // Send upload email notification
-    // var msgRecipient, msgSubject;
-    // var msgContent = 'View the file here: ' + file.getUrl();
-    // msgContent += '\n\n' + file.getDescription();
-    // var msgOptions = {
-    //   name: 'Event Data Uploader',
-    //   replyTo: form.email
-    // }
-
-    // msgRecipient = 'dataentry+' + form.fileType + '@berniesanders.com';
-    // msgSubject = 'New File Upload: ' + fileName;
-
-    // MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
-    // MailApp.sendEmail(form.email, msgSubject, msgContent, msgOptions);
-
-    return originalFileName
+    Logger.log("added file " + url);
+    
+    /**
+     * Add row to sheet
+     * Currently only adds to sheet if an individual event sheet or sign in sheet upload
+     */
+    if(form.fileType == "ev-i" || form.fileType == "si") {
+      addRowToSpreadsheet(url, fileName, form.fileType, form.email);
+    }
+    
+    return url
   }catch(e){
     Logger.log(e.toString());
     return 'Error: ' + e.toString();
