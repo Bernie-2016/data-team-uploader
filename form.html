@@ -1,101 +1,125 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="https://cdn.rawgit.com/SandersForPresident/bootstrap/master/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,900italic,900,700italic,700,400italic,300italic,300,100italic,100|Lora:400,700italic,700,400italic" rel="stylesheet" type="text/css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <?!= include('styles'); ?>
-  </head>
-  <body>
-  <div id="formcontainer">
+	<head>
+		<base target="_top">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" href="https://cdn.rawgit.com/SandersForPresident/bootstrap/master/dist/css/bootstrap.min.css">
+		<link href="https://fonts.googleapis.com/css?family=Lato:400,900italic,900,700italic,700,400italic,300italic,300,100italic,100|Lora:400,700italic,700,400italic" rel="stylesheet" type="text/css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+		<?!= include('styles'); ?>
+	</head>
+	<body>
+	<div id="formcontainer">
 
-    <!-- <div class="alert alert-info" role="alert">
-      <b>Please read the instructions carefully before using this tool.</b><br>
-      <a href="https://docs.google.com/document/d/10w8ipdg-wavBiGyiLdIuVmDfrQFrqTSEfXiIWBfnIrQ/edit?usp=sharing" style="font-size: 1.5em">Using the Event Uploader Tool</a>
-    </div> -->
+		<!-- <div class="alert alert-info" role="alert">
+			<b>Please read the instructions carefully before using this tool.</b><br>
+			<a href="https://docs.google.com/document/d/10w8ipdg-wavBiGyiLdIuVmDfrQFrqTSEfXiIWBfnIrQ/edit?usp=sharing" style="font-size: 1.5em">Using the Event Uploader Tool</a>
+		</div> -->
 
-    <h1 class="page-header">Upload Event Data</h1>
-    <hr>
+		<h1 class="page-header">Upload Event Data</h1>
+		<hr>
+		
+		<div class='alert alert-info'>
+			<a href="https://docs.google.com/document/d/1z7H48LjJRPgy5AHtazNJsbxThSHDi5mrCIRsKGwy2-Y/edit?usp=sharing" class='alert-link'>Click here</a> for picture-taking instructions.
+		</div>
 
-    <form id="uploadEventDataForm">
-      <label for="city">Your Email:</label>
-      <input type="email" name="email" placeholder="email address" class="form-control" value="<?= userEmail ?>" required>
-      <div class="form-group">
-        <label for="source">Event Source:</label>
-        <select name="source" id='sourceSelect' class="form-control" required>
-          <option value="other">Volunteer-Led Barnstorm</option>
-          <option value="barnstorm">Official Barnstorm</option>
-        </select>
-      </div>
-      <div id='barnstormID'>
-        <label for="barnstorm">Select the Barnstorm:</label>
-        <select name="barnstorm" id="barnstormSelect" class="form-control" required>
-          <option></option>
-          <? for (var i = 0; i < barnstorms.length; i++) { ?>
-            <option value="<?= barnstorms[i] ?>"><?= barnstorms[i] ?></option>
-          <? } ?>
-        </select>
-      </div>
-      <div id="locationInputs" class="hidden">
-        <label for="city">Event City:</label>
-        <input type="text" name="city" class="form-control" disabled="disabled">
-        
-        <label for="state">Event State:</label>
-        <select name="state" id="stateSelect" class="form-control" disabled="disabled">
-          <option></option>
-        </select>
-      </div>
+		<form id="uploadEventDataForm" class='form'>
+			
+			<div class='form-group'>
+				<label for="email">Your Email:</label>
+				<input type="email" name="email" placeholder="email address" class="form-control" value="<?= userEmail ?>" required>
+			</div>
+			
+			<div class="form-group">
+				<label for="source">I am a:</label>
+				<div class="radio">
+					<label>
+						<input type="radio" name="source" id="source1" value="vol" required>
+						Bernie Sanders Volunteer
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" name="source" id="source2" value="staff" required>
+						Bernie Sanders Staff
+					</label>
+				</div>
+			</div>
+			
+			<div class='form-group'>
+				<label for="city">Event City:</label>
+				<input type="text" name="city" class="form-control">
+			</div>
 
-      <div>
-        <label for="fileType">What are you uploading?</label>
-        <select name="fileType" class="form-control" required>
-          <option value="pb-c">Complete phonebank sheets</option>
-          <option value="pb-i">Incomplete phonebank sheets</option>
-          <option value="pb-multi">Multi-page phonebank sheets (>1 sheet per file)</option>
-          <option value="pb-a">Archive only (already entered phonebank sheets)</option>
-          <option value="pb-si">Phonebank Sign In Sheets</option>
-          <option value="pb-photos">Phonebank Event Photos</option>
-          <!-- <option value="cv-c">Complete canvass sheets</option>
-          <option value="cv-i">Incomplete canvass sheets</option>
-          <option value="cv-multi">Multi-page canvass sheets (>1 sheet per file)</option>
-          <option value="cv-r">Archive only (already entered canvass sheets)</option>
-          <option value="cv-si">Lists of Canvass Event Attendees</option>
-          <option value="cv-photos">Canvass Event Photos</option> -->
-        </select>
-      </div>
+			<div class='form-group'>
+				<label for="state">Event State:</label>
+				<select name="state" id="stateSelect" class="form-control">
+					<option></option>
+				</select>
+			</div>
 
-      <label for="fileText">Note (optional):</label>
+			<label for="fileType">What are you uploading?</label>
+			<div class="radio">
+				<label>
+					<input type="radio" name="fileType" id="fileType1" value="ev-i" required>
+					Event Sheets
+				</label>
+			</div>
+			<div class="radio">
+				<label>
+					<input type="radio" name="fileType" id="fileType2" value="ev-m" required>
+					Multi-page Event Sheets
+				</label>
+				<span class='help-block'>(Please ensure the host's name is written on ALL PAGES)</span>
+			</div>
+			<div class="radio">
+				<label>
+					<input type="radio" name="fileType" id="fileType3" value="si" required>
+					Sign-In Sheets
+				</label>
+			</div>
 
-          <TEXTAREA
-            name="notes" 
-            placeholder="Add any special notes here"
-            class="form-control"
-            style="height:120px;"
-          ></TEXTAREA>
+			<div class='form-group'>
+				<label for="myFile">Upload Attachment(s):</label>
+				<input type="file" name="filename" id="myFile" multiple>
+				<span class='help-block'>This is a multi-upload file field. To upload multiple files, please select all files at once in your file browser before clicking “open”. On Windows, you can use the Control Key, and on Mac you can use Command Key.</span>
+			</div>
 
-      <br>
+			<button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
 
-      <label for="myFile">Upload Attachment(s):</label>
-      <br>
+		</form>
+	</div>
 
-      <input type="file" name="filename" id="myFile" multiple>
-
-      <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
-
-    </form>
-  </div>
-
-  <br>
-  <div id="output"></div>
-  <div id="progressbar">
-    <div class="progress-label"></div>
-  </div>
+	<br>
+	<div id="output"></div>
+	<div id="progressbar">
+		<div class="progress-label"></div>
+	</div>
 
 <?!= include('states'); ?>
 <?!= include('main_scripts'); ?>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="confirmModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Thank you!</h4>
+      </div>
+      <div class="modal-body">
+      	<!-- Add Bernie Logo Here! -->
+        <p class='lead'>Your uploads have been received and will be prioritized based on the date of the first event listed.<br>Other fully completed forms will be entered within 72 hours.</p>
+        <p>If you have any questions or do not see your event on the map after 72 hours, please email <a href='mailto:dataentry@berniesanders.com'>dataentry@berniesanders.com</a></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" onClick="window.location.reload();" class="btn btn-primary">Upload Additional Files</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -81,6 +81,7 @@ $( document ).ready(function() {
      if( numUploads.done == numUploads.total ){
         numUploads.done = 0;
         $('#uploadEventDataForm :submit').html('Upload Complete').removeClass('btn-primary').addClass('btn-success');
+        $('#confirmModal').modal({keyboard: false, backdrop: 'static', show: true});
      };
   }
 
@@ -89,31 +90,5 @@ $( document ).ready(function() {
     document.getElementById('output').innerHTML = status;
   }
 
-  $('#sourceSelect').on( "change", function(e){
-    if (e.target.value == 'barnstorm'){
-      $('#barnstormID').removeClass('hidden');
-      $('#locationInputs').addClass('hidden');
-
-      $('#barnstormID :input')
-        .prop('required', true)
-        .removeAttr('disabled');
-      $('#locationInputs :input')
-        .prop('required', false)
-        .attr('disabled', 'disabled');
-    }
-    else {
-      $('#barnstormID').addClass('hidden');
-      $('#locationInputs').removeClass('hidden');
-
-      $('#barnstormID :input')
-        .prop('required', false)
-        .attr('disabled', 'disabled');
-      $('#locationInputs :input')
-        .prop('required', true)
-        .removeAttr('disabled');
-    }
-  });
-
-  $('#sourceSelect').change();
 });
 </script>
