@@ -1,27 +1,15 @@
-var SPREADSHEET_ID = '1Io7RR9tqWnYqUHQcOg2IQM5EzZLMKKSGRuSNAmNipv4';
-var SHEET_NAME = 'Data Entry List';
+var EVENT_SHEET_ID = '13yXpJiwJt_s-MKaYavsh4JJSknKzdOiPQkz4iNIhUsc';
+var SIGN_IN_SHEET_ID = '1pRWzQ-AC74skmwqrFeZmtsDGrihrdV5lvWAlC3Z4guA';
+var EVENT_SHEET_NAME = 'PHONE BANKS DO NOT MOVE THIS TAB - 1';
+var SIGN_IN_SHEET_NAME = 'DO NOT MOVE THIS TAB';
+
 var ROOT_FOLDER_ID = '0Bw9Apc7v0NrZMlhBS0JYZHM5cW8';
-var PHOTOS_FOLDER_ID = '0Bw9Apc7v0NrZMXl2XzdWbUpWdHc';
 
 function doGet() {
   var template = HtmlService.createTemplateFromFile('form');
-  var barnstormOptions = SpreadsheetApp
-        .openById(SPREADSHEET_ID)
-        .getSheetByName(SHEET_NAME)
-        .getDataRange()
-        .getValues();
-
-  var barnstorms = [];
-  for (var i = 0; i < barnstormOptions.length; i++) {
-    if (barnstormOptions[i][0]){
-      barnstorms.push(barnstormOptions[i][0]);
-    }
-  }
 
   template.userEmail = Session.getActiveUser().getEmail();
-  template.barnstorms = barnstorms.sort();
   return template.evaluate()
-    // .setFaviconUrl('https://s.bsd.net/bernie16/main/page/-/favicon.ico')
     .setTitle('Upload Event Data')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
@@ -29,6 +17,53 @@ function doGet() {
 
 function include(fileName) {
   return HtmlService.createHtmlOutputFromFile(fileName).getContent();
+}
+
+/**
+ * Adds a row to the spreadsheet using the uploaded file URL and the File Name for friendly display
+*/
+function addRowToSpreadsheet(url, fileName, type, uploadedBy) {
+  
+  if (type == "ev-i") {
+    var sheetID = EVENT_SHEET_ID;
+    var sheetName = EVENT_SHEET_NAME;
+  } else if(type == "si") {
+    var sheetID = SIGN_IN_SHEET_ID;
+    var sheetName = SIGN_IN_SHEET_NAME;
+  } else {
+    return;
+  }
+
+  sheet = SpreadsheetApp
+        .openById(sheetID)
+        .getSheetByName(sheetName);
+
+  var formula = '=HYPERLINK("'+url+'", "'+fileName+'")';
+  sheet.appendRow([formula]);
+
+}
+
+/**
+ * Sends email confirmation to the data entry team and the uploader with a list of uploaded files.
+ */
+function sendEmailConfirmation(uploadedBy, fileList) {
+    var msgRecipient, msgSubject;
+    var msgContent = 'View the files here: ' + fileList.join("\n");
+    var msgOptions = {
+      name: 'Event Data Uploader',
+      replyTo: uploadedBy
+    }
+
+    var confirmOptions = {
+      name: 'Event Data Uploader',
+      replyTo: 'dataentry@berniesanders.com'
+    }
+
+    msgRecipient = 'dataentry@berniesanders.com';
+    msgSubject = 'New Files Uploaded';
+
+    MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
+    MailApp.sendEmail(uploadedBy, msgSubject, msgContent, confirmOptions);
 }
 
 function uploadFileToDrive(base64Data, originalFileName, form, index) {
@@ -44,48 +79,14 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     var byteCharacters = Utilities.base64Decode(splitBase[1]);
     var ss = Utilities.newBlob(byteCharacters, type);
 
-    if (form.source == 'barnstorm'){
-      var firstNameTag = form.barnstorm;
-    }
-    else {
-      var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
-    }
+    var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
 
-    if (form.fileType == 'pb-c'){
-      var folderName = 'Phone Banks';
-    }
-    else if (form.fileType == 'pb-i'){
-      var folderName = 'Incomplete Phone Banks';
-    }
-    else if (form.fileType == 'pb-multi'){
-      var folderName = 'Phone Banks (multiple)';
-    }
-    else if (form.fileType == 'pb-a'){
-      var folderName = 'Archived Phone Banks';
-    }
-    else if (form.fileType == 'pb-si'){
-      var folderName = 'Phone Bank Sign In Sheets';
-    }
-    else if (form.fileType == 'pb-photos'){
-      var folderName = 'Phone Bank Photo Submissions';
-    }
-    else if (form.fileType == 'cv-c' || form.fileType == 'cv-r'){
-      var folderName = 'Canvass Events';
-    }
-    else if (form.fileType == 'cv-i'){
-      var folderName = 'Incomplete Canvass Events';
-    }
-    else if (form.fileType == 'cv-multi'){
-      var folderName = 'Canvass Events (multiple)';
-    }
-    else if (form.fileType == 'cv-si'){
-      var folderName = 'Canvass Sign In Sheets';
-    }
-    else if (form.fileType == 'cv-photos'){
-      var folderName = 'Canvass Photo Submissions';
-    }
-    else {
-      var folderName = 'Mixed Files';
+    if(form.fileType == 'ev-i') {
+      var folderName = 'AUTO Event Sheets';
+    } else if (form.fileType == 'ev-m') {
+      var folderName = 'AUTO Event Sheets (multiple)';
+    } else if (form.fileType == 'si') {
+      var folderName = 'AUTO Sign In Sheets';
     }
 
     // Select folder and set file name
@@ -96,62 +97,37 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     // Get last item in array which should be the extension
     var originalExtension = fileExtensionArray.pop();
 
-    if (folderName === 'Phone Bank Photo Submissions' || folderName === 'Canvass Photo Submissions'){
-      folder = DriveApp.getFolderById(PHOTOS_FOLDER_ID);
+    var rootFolder = DriveApp.getFolderById(ROOT_FOLDER_ID);
+    var folders = rootFolder.getFoldersByName(folderName);
 
-      fileName = firstNameTag + ' ' + form.fileType + ' ' + originalFileName;
-      ss.setName(fileName);
-    }
-    else {
-      var rootFolder = DriveApp.getFolderById(ROOT_FOLDER_ID);
-      var folders = rootFolder.getFoldersByName(folderName);
-
-      if (folders.hasNext()) {
-        folder = folders.next();
-      } else {
-        folder = rootFolder.createFolder(folderName);
-      }
-
-      var uniqueID = new Date();
-      uniqueID = uniqueID.toISOString() + String(index + 1);
-      fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID + '.' + originalExtension;
-      ss.setName(fileName);
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = rootFolder.createFolder(folderName);
     }
 
-    if (form.notes){
-      form.notes = '\n\n' + form.notes;
-    };
+    var uniqueID = new Date();
+    uniqueID = uniqueID.toISOString() + String(index + 1);
+    fileName = firstNameTag + ' ' + form.fileType + ' ' + form.source + ' ' + form.email + ' ' + uniqueID + '.' + originalExtension;
+    ss.setName(fileName);
+    
     var file = folder.createFile(ss)
-        .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes);
-
-    if (form.fileType == 'pb-r'){
-      file.setStarred(true)
-        .setName('[RUSH] ' + fileName);
-    };
-
-    // Send upload email notification
-    var msgRecipient, msgSubject;
-    var msgContent = 'View the file here: ' + file.getUrl();
-    msgContent += '\n\n' + file.getDescription();
-    var msgOptions = {
-      name: 'Event Data Uploader',
-      replyTo: form.email
+        .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes)
+        .setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.VIEW);
+    
+    // Get public File URL so we can add it to the sheet
+    var url = file.getUrl();
+    Logger.log("added file " + url);
+    
+    /**
+     * Add row to sheet
+     * Currently only adds to sheet if an individual event sheet or sign in sheet upload
+     */
+    if(form.fileType == "ev-i" || form.fileType == "si") {
+      addRowToSpreadsheet(url, fileName, form.fileType, form.email);
     }
-    if (folderName === 'Phone Bank Photo Submissions' || folderName === 'Canvass Photo Submissions'){
-      msgRecipient = 'corbin+eventphotos@berniesanders.com';
-      msgSubject = 'New Photo Upload: ' + fileName;
-      msgOptions.htmlBody = msgContent.replace(/(?:\r\n|\r|\n)/g, '<br />') + '<br /><br /><img src="cid:image" />';
-      msgOptions.inlineImages = {'image': file.getBlob()};
-    }
-    else {
-      msgRecipient = 'dataentry+' + form.fileType + '@berniesanders.com';
-      msgSubject = 'New File Upload: ' + fileName;
-    }
-
-    MailApp.sendEmail(msgRecipient, msgSubject, msgContent, msgOptions);
-    MailApp.sendEmail(form.email, msgSubject, msgContent, msgOptions);
-
-    return originalFileName
+    
+    return url
   }catch(e){
     Logger.log(e.toString());
     return 'Error: ' + e.toString();
