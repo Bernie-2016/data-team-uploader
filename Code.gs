@@ -112,8 +112,7 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     ss.setName(fileName);
     
     var file = folder.createFile(ss)
-        .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes)
-        .setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.VIEW);
+        .setDescription('Original name: ' + originalFileName + '\nSubmitted by: ' + form.email + form.notes);
     
     // Get public File URL so we can add it to the sheet
     var url = file.getUrl();
