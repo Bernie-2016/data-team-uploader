@@ -1,8 +1,3 @@
-var EVENT_SHEET_ID = '13yXpJiwJt_s-MKaYavsh4JJSknKzdOiPQkz4iNIhUsc';
-var SIGN_IN_SHEET_ID = '1pRWzQ-AC74skmwqrFeZmtsDGrihrdV5lvWAlC3Z4guA';
-var EVENT_SHEET_NAME = 'PHONE BANKS DO NOT MOVE THIS TAB - 1';
-var SIGN_IN_SHEET_NAME = 'DO NOT MOVE THIS TAB';
-
 var ROOT_FOLDER_ID = '0Bw9Apc7v0NrZMlhBS0JYZHM5cW8';
 
 function doGet() {
@@ -19,29 +14,6 @@ function include(fileName) {
   return HtmlService.createHtmlOutputFromFile(fileName).getContent();
 }
 
-/**
- * Adds a row to the spreadsheet using the uploaded file URL and the File Name for friendly display
-*/
-function addRowToSpreadsheet(url, fileName, type, uploadedBy) {
-  
-  if (type == "ev-i") {
-    var sheetID = EVENT_SHEET_ID;
-    var sheetName = EVENT_SHEET_NAME;
-  } else if(type == "si") {
-    var sheetID = SIGN_IN_SHEET_ID;
-    var sheetName = SIGN_IN_SHEET_NAME;
-  } else {
-    return;
-  }
-
-  sheet = SpreadsheetApp
-        .openById(sheetID)
-        .getSheetByName(sheetName);
-
-  var formula = '=HYPERLINK("'+url+'", "'+fileName+'")';
-  sheet.appendRow([formula]);
-
-}
 
 /**
  * Sends email confirmation to the data entry team and the uploader with a list of uploaded files.
@@ -82,11 +54,11 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     var firstNameTag = form.state + ' - ' + toTitleCase(form.city);
 
     if(form.fileType == 'ev-i') {
-      var folderName = 'AUTO Event Sheets';
+      var folderName = 'Event Sheets - Single Page';
     } else if (form.fileType == 'ev-m') {
-      var folderName = 'AUTO Event Sheets (multiple)';
+      var folderName = 'Event Sheets - Multiple Pages';
     } else if (form.fileType == 'si') {
-      var folderName = 'AUTO Sign In Sheets';
+      var folderName = 'Sign In Sheets';
     }
 
     // Select folder and set file name
@@ -117,14 +89,6 @@ function uploadFileToDrive(base64Data, originalFileName, form, index) {
     // Get public File URL so we can add it to the sheet
     var url = file.getUrl();
     Logger.log("added file " + url);
-    
-    /**
-     * Add row to sheet
-     * Currently only adds to sheet if an individual event sheet or sign in sheet upload
-     */
-    if(form.fileType == "ev-i" || form.fileType == "si") {
-      addRowToSpreadsheet(url, fileName, form.fileType, form.email);
-    }
     
     return url
   }catch(e){
