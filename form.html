@@ -60,19 +60,20 @@
 						<option></option>
 					</select>
 				</div>
-				<label for="fileType">VERY IMPORTANT: UPLOAD IN THREE SEPARATE BATCHES</label>
+				<label for="fileType" class='text-danger'>VERY IMPORTANT: UPLOAD EACH TYPE OF FILE IN SEPARATE BATCHES</label>
 				<div class="radio">
 					<label>
 						<input type="radio" name="fileType" value="ev-i" required>
 						Single-page Event Sheets (RSVPs completely fit on the page with the calendar)
 					</label>
+					<span class='help-block text-danger'>If an event's RSVP's span more than one page, please select Multi-page Sheets</span>
 				</div>
 				<div class="radio">
 					<label>
 						<input type="radio" name="fileType" value="ev-m" required>
 						Multi-page Event Sheets (RSVPs span more than one page)
 					</label>
-					<span class='help-block'>Write host's name on every page or we don't know which event the RSVPs belong to!</span>
+					<span class='help-block text-danger'>Write host's name on every page or we don't know which event the RSVPs belong to!</span>
 				</div>
 				<div class="radio">
 					<label>
